@@ -1,0 +1,60 @@
+
+* time, space, stacking, slicing, scanning, etc 
+
+"Slitscan imaging techniques are used to create static images of time-based phenomena. In traditional film photography, slit scan images are created by exposing film as it slides past a slit-shaped aperture. In the digital realm, thin slices are extracted from a sequence of video frames, and concatenated into a new image."
+
+[[http://www.flong.com/texts/lists/slit_scan/][An Informal Catalogue of Slit-Scan Video Artworks and Research]] Compiled by Golan Levin.
+
+#+ATTR_HTML: :style margin-left: auto; margin-right: auto;
+#+name: unfolding
+#+caption: Egbert Mittelstaedt. Unfolding (2002)
+[[http://www.flong.com/storage/images/texts/slit_scan/34_egbert_mittelstaedt_665px.jpg]]
+
+This particular slitscan provides some slightly configurable scaffolding around ffmpeg (based on a blogpost from [[http://oioiiooixiii.blogspot.com/2017/11/ffmpeg-temporal-slice-stacking-effect.html][oioiiooixiii]]) and is intended for non-realtime rendering at various resolutions. it's neither first, nor last. it's not especially interesting, educational or efficient. just another cloudform in the endless space of possible implementation... 
+
+* installation, configuration, operation, etc
+
+install (mac)...
+#+BEGIN_SRC shell
+brew install ffmpeg drracket
+git clone https://github.com/zzkt/slitscan.git
+#+END_SRC
+
+install (debian/ubuntu)...
+#+BEGIN_SRC shell
+sudo apt install ffmpeg racket
+git clone https://github.com/zzkt/slitscan.git
+#+END_SRC
+
+simple transform...
+#+BEGIN_SRC shell
+racket slitscan.rkt -v -i <input.mp4> 
+#+END_SRC
+
+transform at 1080p and delete working files, with minimal command line noise...
+#+BEGIN_SRC shell
+racket slitscan.rkt --width 1920 --height 1080 --loglevel quiet --cleanup -i <input.mp4> 
+#+END_SRC
+
+options...
+#+BEGIN_SRC shell
+slitscan [ <option> ... ]
+ where <option> is one of
+  -v, --verbose : various verbose messages
+  -l <level>, --loglevel <level> : loglevel for ffmpeg e.g. quiet, error, warning, info, debug
+  -c, --cleanup : Clean up temporary/working files
+  --horizontal : output a horizontal video only (default: both)
+  --vertical : output a vertical video only (default: both)
+  --width <pixels> : width of output output video
+  --height <pixels> : height of output output video
+  -i <video>, --input <video> : input file
+  -f <folder>, --folder <folder> : input folder
+  --help, -h : Show this help
+#+END_SRC
+
+
+* further reading
+
+  - The Fourth Dimension and How to Get There by Rudy Rucker
+  - Muybridge's Complete Human and Animal Locomotion, Vol. I
+  - Baroness Elsa, by Irene Gammel
