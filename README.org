@@ -51,8 +51,8 @@ slitscan [ <option> ... ]
 
 * further, etc
 
+[[slitscope_1.jpeg]]
+
   - The Fourth Dimension and How to Get There by Rudy Rucker
   - Muybridge's Complete Human and Animal Locomotion, Vol. I
   - Baroness Elsa, by Irene Gammel
-
-[[slitscope_1.jpeg]]
