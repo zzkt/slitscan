@@ -5,7 +5,7 @@
 
 [[http://www.flong.com/texts/lists/slit_scan/][An Informal Catalogue of Slit-Scan Video Artworks and Research]] Compiled by Golan Levin.
 
-[[slitscope.jpeg]]
+[[slitscope_0.jpeg]]
 
 This particular slitscan provides some slightly configurable scaffolding around ffmpeg (based on a blogpost from [[http://oioiiooixiii.blogspot.com/2017/11/ffmpeg-temporal-slice-stacking-effect.html][oioiiooixiii]]) and is intended for non-realtime rendering at various resolutions. it's neither first, nor last. it's not especially interesting, educational or efficient. just another cloudform in the endless space of possible implementation... 
 
@@ -47,11 +47,12 @@ slitscan [ <option> ... ]
   -i <video>, --input <video> : input file
   -f <folder>, --folder <folder> : input folder
   --help, -h : Show this help
-#+END_SRC
+#+END_SR
 
-
-* further reading
+* further, etc
 
   - The Fourth Dimension and How to Get There by Rudy Rucker
   - Muybridge's Complete Human and Animal Locomotion, Vol. I
   - Baroness Elsa, by Irene Gammel
+
+[[slitscope_1.jpeg]]
