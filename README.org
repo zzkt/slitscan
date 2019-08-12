@@ -47,7 +47,7 @@ slitscan [ <option> ... ]
   -i <video>, --input <video> : input file
   -f <folder>, --folder <folder> : input folder
   --help, -h : Show this help
-#+END_SR
+#+END_SRC
 
 * further, etc
 
