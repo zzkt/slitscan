@@ -5,10 +5,7 @@
 
 [[http://www.flong.com/texts/lists/slit_scan/][An Informal Catalogue of Slit-Scan Video Artworks and Research]] Compiled by Golan Levin.
 
-#+ATTR_HTML: :style margin-left: auto; margin-right: auto;
-#+name: unfolding
-#+caption: Egbert Mittelstaedt. Unfolding (2002)
-[[http://www.flong.com/storage/images/texts/slit_scan/34_egbert_mittelstaedt_665px.jpg]]
+[[slitscope.jpeg]]
 
 This particular slitscan provides some slightly configurable scaffolding around ffmpeg (based on a blogpost from [[http://oioiiooixiii.blogspot.com/2017/11/ffmpeg-temporal-slice-stacking-effect.html][oioiiooixiii]]) and is intended for non-realtime rendering at various resolutions. it's neither first, nor last. it's not especially interesting, educational or efficient. just another cloudform in the endless space of possible implementation... 
 
