@@ -12,29 +12,29 @@ This particular slitscan provides some slightly configurable scaffolding around 
 * installation, configuration, operation, etc
 
 install (mac)...
-#+BEGIN_SRC shell
+#+BEGIN_SRC text
 brew install ffmpeg drracket
 git clone https://github.com/zzkt/slitscan.git
 #+END_SRC
 
 install (debian/ubuntu)...
-#+BEGIN_SRC shell
+#+BEGIN_SRC text
 sudo apt install ffmpeg racket
 git clone https://github.com/zzkt/slitscan.git
 #+END_SRC
 
 simple transform...
-#+BEGIN_SRC shell
+#+BEGIN_SRC text
 racket slitscan.rkt -v -i <input.mp4> 
 #+END_SRC
 
 transform at 1080p and delete working files, with minimal command line noise...
-#+BEGIN_SRC shell
+#+BEGIN_SRC text
 racket slitscan.rkt --width 1920 --height 1080 --loglevel quiet --cleanup -i <input.mp4> 
 #+END_SRC
 
 options...
-#+BEGIN_SRC shell
+#+BEGIN_SRC text
 slitscan [ <option> ... ]
  where <option> is one of
   -v, --verbose : various verbose messages
