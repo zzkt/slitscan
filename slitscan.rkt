@@ -25,7 +25,7 @@
 ;;;
 ;;; Requirements
 ;;;
-;;;  Racket, ffmpeg and zsh or bash (probably)
+;;;  Racket, ffmpeg and zsh or bash (and probably works with other shells)
 ;;;
 ;;; Commentary
 ;;;
@@ -43,10 +43,12 @@
 
 
 ;; cli options
+(define filename (make-parameter ""))
 (define verbose? (make-parameter #f))
 (define cleanup? (make-parameter #f))
-(define filename (make-parameter "untitled"))
-(define input-folder (make-parameter ""))
+(define noresize? (make-parameter #f))
+(define in-folder (make-parameter ""))
+(define out-folder (make-parameter ""))
 (define loglevel (make-parameter "")) ;; leave unset by default
 
 ;; output options horiz/vert/both
@@ -61,17 +63,21 @@
   (command-line
    #:program "slitscan"
    #:once-each
-   (("-v" "--verbose")  "various verbose messages" (verbose? #t))
-   (("-l" "--loglevel") level "loglevel for ffmpeg e.g. quiet, error, warning, info, debug" (loglevel level))
-   (("-c" "--cleanup")  "Clean up temporary/working files" (cleanup? #t))
-   (("--horizontal")    "output a horizontal video only (default: both)" (hout-only? #t))
-   (("--vertical")      "output a vertical video only (default: both)" (vout-only? #t))
-   (("--width")         pixels "width of transform video" (output-width pixels))
-   (("--height")        pixels "height of tansform video"  (output-height pixels))   
-   (("-i" "--input")    video "input file" (filename video))
-   (("-f" "--folder")   folder "input folder"  (input-folder folder))
-   #:args () ; rest of the args? 
-   (printf "slitscanning: ~a\n" (filename))))
+   (("-v" "--verbose")    "various verbose messages" (verbose? #t))
+   (("-l" "--loglevel")   level "loglevel for ffmpeg e.g. quiet, error, warning, info, debug" (loglevel level))
+   (("-c" "--cleanup")    "Clean up temporary/working files" (cleanup? #t))
+   (("-n" "--noresize")   "do not resize the input file" (noresize? #t))   
+   (("--horizontal")      "output a horizontal video only (default: both)" (hout-only? #t))
+   (("--vertical")        "output a vertical video only (default: both)" (vout-only? #t))
+   (("--width")           pixels "width of transform video" (output-width pixels))
+   (("--height")          pixels "height of tansform video"  (output-height pixels))   
+   (("-f" "--in-folder")  folder "input folder"  (in-folder folder))
+   (("-o" "--out-folder") folder "output folder" (out-folder folder))
+   #:args (video-file) ; rest of the args?
+   (filename video-file)
+   (if (file-exists? (filename))
+       (printf "slitscanning: ~a\n" (filename))
+       (raise-user-error 'slitscan "File '~a' does not exist." (filename)))))
 
 ;; emulation of $(...) shell syntax 
 (define-syntax zout 
@@ -87,11 +93,11 @@
       ((and (not (verbose?)) (string=? "" (loglevel))) (loglevel "error")))
 
 ;; variables/various
-(define folder (if (not (string=? "" (input-folder)))
-                   (input-folder) 
+(define folder (if (not (string=? "" (in-folder)))
+                   (in-folder) 
                    (zout "mktemp -d")))
 
-(vecho "using folder: ~a\n" folder)
+(vecho "using folder '~a' for input\n" folder)
 
 ;(define fffeature "ffprobe -v quiet -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=")
 
@@ -99,10 +105,10 @@
 
 ;; assume most/all codecs/formats/streams have a duration
 (define duration (let ((f (string->number
-                            (zout (format
-                                   "~aduration \"~a\""
-                                   fffeature (filename))))))
-                    (if f f 0)))
+                           (zout (format
+                                  "~aduration \"~a\""
+                                  fffeature (filename))))))
+                   (if f f 0)))
 
 (vecho "duration: ~a seconds\n" duration)
 
@@ -117,10 +123,10 @@
 
 ;; number of frames. estimate for codecs/formats/streams without nb_frames 
 (define frames (let ((f (string->number
-                           (zout (format
-                                  "~anb_frames \"~a\""
-                                  fffeature (filename))))))
-                   (if f f (ceiling (* duration fps)))))
+                         (zout (format
+                                "~anb_frames \"~a\""
+                                fffeature (filename))))))
+                 (if f f (ceiling (* duration fps)))))
 
 (vecho "frames: ~a\n" frames)
 
@@ -143,10 +149,11 @@
 ;; rezise video
 (define resized-video (string-append folder "/resized.mkv"))
 
+;; resize video, or copy file if 'noresize?' option is set
 (define (resize)
   (define ffmpeg-r1
     (format "ffmpeg -loglevel ~a -i \"~a\" -vf ~a -crf 10 \"~a\" 2>&1 | grep 'frame=' | tr \\n \\r; echo"
-             (loglevel) (filename) scale resized-video)) 
+            (loglevel) (filename) scale resized-video)) 
   (vecho "resizing video: ~a\n" resized-video)
   (system ffmpeg-r1))
 
@@ -199,12 +206,12 @@
   (define ffmpeg-a1 ;; horizontal frame stack 
     (format   
      "ffmpeg -loglevel ~a -r ~a -i ~a/horz_frame%d.png \"~a_horizontal-smear.mkv\""
-      (loglevel) fps folder (filename)))
+     (loglevel) fps folder (filename)))
 
   (define ffmpeg-a2 ;; vertical frame stack 
     (format   
      "ffmpeg -loglevel ~a -r ~a -i ~a/vert_frame%d.png \"~a_vertical-smear.mkv\""
-      (loglevel) fps folder (filename)))
+     (loglevel) fps folder (filename)))
   
   ;; assemble
   (cond  ((hout-only?) (system ffmpeg-a1))  
@@ -234,10 +241,16 @@
       (vecho "leaving working files at ~a\n" folder)))
 
 ;; output in 3 (or 4 (or 5)) steps
+  
+  (define (slitscan)
+    (when (resize)   (printf "resized\n"))
+    (when (slice)    (printf "sliced\n"))
+    (when (assemble) (printf "assembled\n"))
+    (when (cleanup)  (printf "done\n")))
 
-(when (resize)   (printf "resized\n"))
-(when (slice)    (printf "slicwd\n"))
-(when (assemble) (printf "assembled\n"))
-(when (cleanup)  (printf "done\n"))
+  
+  ;; (printf "The file '~a' does not exist.\n" (filename))
+
+(slitscan)
 
 ;;; FIN
